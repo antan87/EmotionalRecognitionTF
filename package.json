@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/antan87/EmotionalRecognitionTF/issues"
   },
-  "homepage": "https://github.com/antan87/EmotionalRecognitionTF#readme"
+  "homepage": "https://github.com/antan87/EmotionalRecognitionTF#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
 }
