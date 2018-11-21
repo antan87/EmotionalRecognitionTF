@@ -7,7 +7,7 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const routes = require('./routes/index');
-const server = require('http').createServer(app);
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -57,8 +57,8 @@ if (app.get('env') === 'development') {
     });
 
     app.set('port', process.env.PORT || 3000);
-    server.listen(app.get('port'), function () {
-        debug('Express server listening on port ' + server.address().port);
+    app.listen(app.get('port'), function () {
+        debug('Express server listening on port ' + app.get('port'));
     });
 
 }
