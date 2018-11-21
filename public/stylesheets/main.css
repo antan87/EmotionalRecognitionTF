@@ -12,3 +12,10 @@ h2,
 h3 {
     display: inline;
 }
+
+
+#video-container {
+    width: 500px;
+    height: 375px;
+    background-color: #666;
+}
