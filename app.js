@@ -6,10 +6,10 @@ const app = express();
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const favicon = require('serve-favicon');
-
-const routes = require('./routes/index');
-
+ require('serve-favicon');
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
+const routes = require('./routes/index')(io);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -57,9 +57,9 @@ if (app.get('env') === 'development') {
         });
     });
 
-    app.set('port', process.env.PORT || 3000);
-    app.listen(app.get('port'), function () {
-        debug('Express server listening on port ' + app.get('port'));
-    });
+ app.set('port', process.env.PORT || 3000);
+server.listen(app.get('port'), function () {
+    debug('Express server listening on port ' + server.address().port);
+});
 
 }

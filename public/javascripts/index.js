@@ -1,9 +1,20 @@
-let video = null;
+  // TODO: put you code here 
+
 let canvas = null;
 let ctx = null;
 let btnSnap = null;
 let face = null;
-const faceDetector = new window.FaceDetector()
+const faceDetector = new FaceDetector();
+console.log(faceDetector);
+const socket = io.connect('http://localhost:3000');
+
+socket.on('imageConversionByServer', function(data) {
+  
+  let img = document.getElementById('img-container');
+  img.setAttribute('src', data);
+  
+});
+
 
 function setup() {
   canvas = document.createElement('canvas');
@@ -14,22 +25,8 @@ function setup() {
   canvas.style.position = "absolute";
   canvas.style.border = "1px solid";
 
-
-  video = document.getElementById('video-container');
-  if (navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({
-        video: true
-      })
-      .then(function (stream) {
-        video.srcObject = stream;
-        video.play();
-      })
-      .catch(function (err0r) {
-        console.log("Something went wrong!");
-      });
-  };
+ 
   ctx = canvas.getContext("2d");
-
   btnSnap = document.getElementById('btn-snap');
 
   btnSnap.addEventListener("click", function () {
@@ -40,9 +37,6 @@ function setup() {
 
 function draw() {
   let img = document.getElementById('img-container');
-  if (img === null || img === undefined)
-    background(0);
-  else
     background(0);
   // image(capture, 0, 0, 320, 240);
   // filter('INVERT');
@@ -65,25 +59,45 @@ function draw() {
 }
 
 async function takeSnapShot() {
-  if (video === null || canvas === null)
-    return;
 
-
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   let img = document.getElementById('img-container');
-  img.src = canvas.toDataURL('image/jpeg');
+  const scale = img.width / img.naturalWidth;
+  faceDetector
+    .detect(img)
+    .then(faces => 
+      faces.map((face) => {
+        console.log(face);
+        return face.boundingBox
+      })
+    )
+    .then(faceBoxes => {
+      faceBoxes.forEach(faceBox => {
+        const { 
+          height, width, top, left 
+        } = faceBox;
 
-  faceDetector.detect(img).then((faces) => {
+        const div = drawFaceBox(
+          height, width, top, left, scale
+        );
+        img.parentElement.appendChild(div);
+      });
+    })
+    .catch(err => console.log(err));
 
-    for (let index = 0; index < faces.length; index++) {
-      face = faces[index];
-      console.log(face);
+  }
 
-      for (let index2 = 0; index2 < face.landmarks.length; index2++) {}
-    }
-  });
-
-}
+  const drawFaceBox = (height, width, top, left, scale) => {
+    const div = document.createElement('div');
+    div.className = 'face-box';
+    div.style.cssText = `
+      top: ${top * scale}px;
+      left: ${left * scale}px;
+      height: ${height * scale}px;
+      width: ${width * scale}px;
+    `;
+    return div;
+  };
+  
 
 
 function drawFace(img) {
