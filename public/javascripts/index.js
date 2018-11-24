@@ -14,7 +14,6 @@
     img = new Image();
     img.setAttribute('src', data);
     imgP5 = loadImage(data);
-    console.log(img);
     resizeCanvas(img.width, img.height);
   });
 

@@ -1,19 +1,20 @@
 'use strict';
+module.exports = (io) => {
+
     const express = require('express');
     const router = express.Router();
+    const fs = require('fs');
 
     /* GET home page. */
     router.get('/', function (req, res) {
-    res.render('index', {
+        res.render('index', {
             title: 'Express'
         });
     });
 
-<<<<<<< Updated upstream
-=======
     io.on('connection', (socket) => {
         // fs.readFile('./images/kim-un.jpg', function (err, data) {
-        fs.readFile('./images/img4.jpg', function (err, data) {
+        fs.readFile('./images/img3.jpg', function (err, data) {
             socket.emit('imageConversionByClient', {
                 image: true,
                 buffer: data
@@ -24,6 +25,5 @@
     });
 
     return router;
->>>>>>> Stashed changes
 
-module.exports = router;
+};
