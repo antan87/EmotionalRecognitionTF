@@ -1,38 +1,46 @@
-  // TODO: put you code here 
+let video = null;
+let canvas = null;
+let faceShapes = null;
+const faceDetector = new FaceDetector({});
 
-  let canvas = null;
-  let ctx = null;
-  let btnSnap = null;
-  let faceShape = null;
-  const faceDetector = new FaceDetector();
-  const socket = io.connect('http://localhost:3000');
-  let img = null;
-  let imgP5 = null;
+function setup() {
+  canvas = createCanvas(1280 / 2, 720 / 2);
+  let constraints = {
+    video: {
+      mandatory: {
+        minWidth: 1280 / 2,
+        minHeight: 720 / 2
+      },
+      optional: [{
+        maxFrameRate: 50
+      }]
+    },
+    audio: false
+  };
+  video = createCapture(constraints, function (stream) {});
+  video.hide();
 
-  socket.on('imageConversionByServer', function (data) {
+  setInterval(async function () {
+    await faceDetector.detect(canvas.canvas)
+      .then((faces) => {
+        faceShapes = faces;
+        if (faceShapes[0] != null && faceShapes[0].landmarks.length > 0)
+          console.log(aceShapes.landmarks);
+        return faces;
+      })
+      .catch(err => console.log(err));
+    //code goes here that will be run every 5 seconds.    
+  }, 100);
 
-    img = new Image();
-    img.setAttribute('src', data);
-    imgP5 = loadImage(data);
-  });
+}
 
+function draw() {
 
-  function setup() {
-    btnSnap = document.getElementById('btn-snap');
-    btnSnap.addEventListener("click", function () {
-      takeSnapShot();
-    });
-    createCanvas(720, 400);
-  }
+  image(video, 0, 0, video.width, video.height);
 
-  function draw() {
+  if (faceShapes !== null) {
 
-    if (imgP5 !== null) {
-      image(imgP5, 0, 0);
-    }
-
-    if (faceShape !== null) {
-
+    faceShapes.forEach((faceShape) => {
       const {
         width,
         height,
@@ -40,106 +48,9 @@
         left
       } = faceShape.boundingBox;
 
-      stroke(0);
+      stroke(190);
       noFill();
       rect(left, top, width, height);
-
-      // Setting the outline (stroke) to black
-      // A rectangle
-
-
-
-    }
+    });
   }
-
-  async function takeSnapShot() {
-
-    const scale = img.width / img.naturalWidth;
-    faceDetector
-      .detect(img)
-      .then(faces =>
-        faces.map((face) => {
-          faceShape = face;
-          return face.boundingBox
-        })
-      )
-      .catch(err => console.log(err));
-
-  }
-
-  const drawFaceBox = (height, width, top, left, scale) => {
-    const div = document.createElement('div');
-    div.className = 'face-box';
-    div.style.cssText = `
-      top: ${top * scale}px;
-      left: ${left * scale}px;
-      height: ${height * scale}px;
-      width: ${width * scale}px;
-    `;
-    return div;
-  };
-
-
-
-
-
-  // })
-
-  // document.addEventListener('DOMContentLoaded', function () {
-  //   const video = document.getElementById('video-container');
-  //   const canvas = document.getElementById('img-container');
-  //   const faceDetector = new window.FaceDetector()
-  //   let faces = null;
-  //   let context = canvas.getContext('2d')
-  //   const videoCompStyle = window.getComputedStyle(video)
-  //   const videoWidth = videoCompStyle.width.replace('px', '')
-  //   const videoHeight = videoCompStyle.height.replace('px', '')
-
-  //   setTimeout(100, tt());
-
-
-  //   async function tt() {
-  //     context = canvas.getContext('2d')
-  //     context.drawImage(video, 0, 0, videoWidth, videoHeight)
-  //     faces = await faceDetector.detect(canvas);
-  //     console.log(faces);
-  //   };
-
-
-  //   if (navigator.mediaDevices.getUserMedia) {
-  //     navigator.mediaDevices.getUserMedia({
-  //         video: true
-  //       })
-  //       .then(function (stream) {
-  //         video.srcObject = stream;
-  //       })
-  //       .catch(function (err0r) {
-  //         console.log("Something went wrong!");
-  //       });
-  //   };
-  //   // loop(canvas, video, 100);
-  //   let hideTimeout = 100;
-  //   async function loop(canvas, video, overlay) {
-  //     window.requestAnimationFrame(() => loop(canvas, video, overlay))
-  //     const context = canvas.getContext('2d')
-  //     const videoCompStyle = window.getComputedStyle(video)
-  //     const videoWidth = videoCompStyle.width.replace('px', '')
-  //     const videoHeight = videoCompStyle.height.replace('px', '')
-  //     context.drawImage(video, 0, 0, videoWidth, videoHeight)
-
-  //     clearTimeout(hideTimeout)
-  //     if (faces !== null && faces.length) {
-  //       const face = faces[0].boundingBox
-  //       console.log('Face detected on video frame: ', face)
-  //     } else {
-  //       // hideTimeout = hideOverlay(overlay)
-  //     }
-
-  //     if (isDetectingFaces) return
-
-  //     isDetectingFaces = true
-  //     faces = await faceDetector.detect(canvas)
-  //     isDetectingFaces = false
-  //   }
-
-  //  })
+}
